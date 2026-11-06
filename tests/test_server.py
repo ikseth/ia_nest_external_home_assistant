@@ -161,3 +161,14 @@ async def test_live_context_passes_filters_and_refuses_oversized_unfiltered(ha_s
     assert "filter" in unfiltered.content[0].text
     assert bad.isError is True
     assert [c["arguments"] for c in calls(record)] == [{"name": "luz de prueba"}, {}]
+
+
+@pytest.mark.asyncio
+async def test_empty_selectors_are_dropped_before_calling_home_assistant(ha_server):
+    ha_url, record = ha_server
+    port = free_port()
+    async with run_gateway(settings(ha_url), port):
+        async with gateway_client(f"http://127.0.0.1:{port}", "core-token-not-logged") as client:
+            result = await client.call_tool("fan_set_speed", {"name": "ventilador", "area": "", "floor": "", "percentage": 50})
+    assert result.isError is False
+    assert calls(record)[0]["arguments"] == {"name": "ventilador", "percentage": 50, "domain": ["fan"]}

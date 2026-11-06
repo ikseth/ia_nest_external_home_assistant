@@ -107,6 +107,8 @@ class CatalogServer:
                 _log_call(name, arguments, None, "rejected", started)
                 return _error("Tool is not available.")
 
+            # Los modelos rellenan a veces los selectores con "": no es un filtro, se quita.
+            arguments = {key: value for key, value in (arguments or {}).items() if value != ""}
             try:
                 Draft202012Validator(catalog_tool.input_schema).validate(arguments)
             except ValidationError:
