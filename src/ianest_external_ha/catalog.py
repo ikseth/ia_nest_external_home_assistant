@@ -23,11 +23,37 @@ class CatalogTool:
     annotations: dict[str, bool]
 
 
+_NAME = "Device name or alias exactly as the person says it, for example 'luz de prueba'. Prefer it when the person names a device."
+_AREA = "Room or area name, for example 'Salon'. Use it only when the person names a room."
+_FLOOR = "Floor name. Use it only when the person names a floor."
+
+# Lectura del estado: Home Assistant filtra por nombre, area o dominio. Una respuesta mayor que
+# este limite no se entrega truncada (el modelo supondria estados): se pide repetir con filtro.
+LIVE_CONTEXT_MAX_CHARS = 4000
+LIVE_CONTEXT_TOO_LARGE = (
+    "Too much data for one answer. Call get_live_context again with a filter: "
+    "name (a device), area (a room) or domain (for example 'light')."
+)
+
+_LIVE_CONTEXT_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "name": {"type": "string", "description": "Only devices with this name or alias, for example 'luz de prueba'."},
+        "area": {"type": "string", "description": "Only devices in this room or area, for example 'Salon'."},
+        "domain": {
+            "type": "string",
+            "description": "Only devices of this type: light, fan, climate, media_player, sensor, binary_sensor, switch or weather.",
+        },
+    },
+    "additionalProperties": False,
+}
+
+
 def _selector_schema(extra: dict[str, Any] | None = None) -> dict[str, Any]:
     properties: dict[str, Any] = {
-        "name": {"type": "string"},
-        "area": {"type": "string"},
-        "floor": {"type": "string"},
+        "name": {"type": "string", "description": _NAME},
+        "area": {"type": "string", "description": _AREA},
+        "floor": {"type": "string", "description": _FLOOR},
     }
     if extra:
         properties.update(extra)
@@ -52,8 +78,8 @@ CATALOG: tuple[CatalogTool, ...] = (
     CatalogTool(
         "get_live_context",
         "GetLiveContext",
-        "Read the CURRENT state of the home: every exposed device, sensor and area with its state and attributes (lights on or off, temperatures, media players, fans). Use it before answering any question about the state of the house; never guess a state.",
-        {"type": "object", "properties": {}, "additionalProperties": False},
+        "Read the CURRENT state of devices and sensors of the home (lights on or off, temperatures, media players, fans). Always filter by name, area or domain. Use it before answering any question about the state of the house; never guess a state.",
+        _LIVE_CONTEXT_SCHEMA,
         {},
         _READ_ONLY,
     ),

@@ -13,7 +13,7 @@ from mcp.server import Server
 from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
 from mcp.types import CallToolResult, TextContent, Tool, ToolAnnotations
 
-from .catalog import CATALOG, CATALOG_BY_NAME, CatalogTool
+from .catalog import CATALOG, CATALOG_BY_NAME, LIVE_CONTEXT_MAX_CHARS, LIVE_CONTEXT_TOO_LARGE, CatalogTool
 from .upstream import HomeAssistantClient, UpstreamError, UpstreamTool, resolve_intent
 
 
@@ -126,6 +126,12 @@ class CatalogServer:
             except UpstreamError:
                 _log_call(name, arguments, catalog_tool.intent, "upstream_error", started)
                 return _error("Home Assistant is unavailable.")
+
+            if name == "get_live_context" and not result.is_error:
+                size = sum(len(getattr(item, "text", "") or "") for item in result.content)
+                if size > LIVE_CONTEXT_MAX_CHARS:
+                    _log_call(name, arguments, catalog_tool.intent, "too_large", started)
+                    return _error(LIVE_CONTEXT_TOO_LARGE)
 
             status = "ha_error" if result.is_error else "ok"
             _log_call(name, arguments, catalog_tool.intent, status, started)

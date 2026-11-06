@@ -57,6 +57,9 @@ def create_app(record_path: Path, without_turn_domain: bool = False) -> Starlett
     async def call_tool(name: str, arguments: dict[str, Any]) -> CallToolResult:
         with record_path.open("a", encoding="ascii") as stream:
             stream.write(json.dumps({"name": name, "arguments": arguments}, ensure_ascii=True) + "\n")
+        if name == "homeassistant__GetLiveContext":
+            text = "x" * 5000 if not arguments else json.dumps({"filtered": arguments}, sort_keys=True)
+            return CallToolResult(content=[TextContent(type="text", text=text)], isError=False)
         if arguments.get("name") == "ha_error":
             return CallToolResult(content=[TextContent(type="text", text="Home Assistant reported an error.")], isError=True)
         if name == "intent__HassTurnOn" and arguments.get("domain") == ["lock"]:

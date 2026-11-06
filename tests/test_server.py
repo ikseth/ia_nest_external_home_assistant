@@ -144,3 +144,20 @@ def test_missing_core_token_configuration_prevents_start(tmp_path: Path):
     ha_token.write_text("ha", encoding="ascii")
     with pytest.raises(ConfigurationError, match="CORE_TOKEN"):
         Settings.from_environment({"IANEST_EXTERNAL_HA_URL": "http://ha.example", "IANEST_EXTERNAL_HA_TOKEN_FILE": str(ha_token)})
+
+
+@pytest.mark.asyncio
+async def test_live_context_passes_filters_and_refuses_oversized_unfiltered(ha_server):
+    ha_url, record = ha_server
+    port = free_port()
+    async with run_gateway(settings(ha_url), port):
+        async with gateway_client(f"http://127.0.0.1:{port}", "core-token-not-logged") as client:
+            filtered = await client.call_tool("get_live_context", {"name": "luz de prueba"})
+            unfiltered = await client.call_tool("get_live_context", {})
+            bad = await client.call_tool("get_live_context", {"entity_id": "lock.door"})
+    assert filtered.isError is False
+    assert json.loads(filtered.content[0].text) == {"filtered": {"name": "luz de prueba"}}
+    assert unfiltered.isError is True
+    assert "filter" in unfiltered.content[0].text
+    assert bad.isError is True
+    assert [c["arguments"] for c in calls(record)] == [{"name": "luz de prueba"}, {}]

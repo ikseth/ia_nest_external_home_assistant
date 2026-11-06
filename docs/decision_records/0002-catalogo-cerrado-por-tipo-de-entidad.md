@@ -36,7 +36,7 @@ modelo no puede elegirlo. Lo que no esta en el catalogo no se publica.
 
 | Herramienta | Llama a | Argumentos que acepta | Fijado por la capa | Anotaciones |
 |---|---|---|---|---|
-| `get_live_context` | `GetLiveContext` | ninguno | - | solo lectura |
+| `get_live_context` | `GetLiveContext` | `name`, `area`, `domain` (filtros de Home Assistant) | - | solo lectura |
 | `get_date_time` | `GetDateTime` | ninguno | - | solo lectura |
 | `light_turn_on` | `HassTurnOn` | `name`, `area`, `floor` | `domain: [light]` | no destructiva |
 | `light_turn_off` | `HassTurnOff` | `name`, `area`, `floor` | `domain: [light]` | no destructiva |
@@ -46,6 +46,14 @@ modelo no puede elegirlo. Lo que no esta en el catalogo no se publica.
 | `media_set_volume` | `HassSetVolume` | `name`, `area`, `floor`, `volume_level` 0-100 | `domain: [media_player]` | no destructiva |
 | `climate_set_temperature` | `HassClimateSetTemperature` | `name`, `area`, `floor`, `temperature` | - | no destructiva |
 | `fan_set_speed` | `HassFanSetSpeed` | `name`, `area`, `floor`, `percentage` 0-100 | `domain: [fan]` | no destructiva |
+
+Visto en el laboratorio el 2026-11-06: la lectura sin filtro de la casa ocupa
+unos 11 KB y no cabe en la ventana de 4096 tokens del modelo de `domotica` (el
+turno terminaba sin texto). Por eso `get_live_context` publica los filtros que
+ya acepta Home Assistant, y una respuesta de mas de 4000 caracteres no se entrega
+truncada, que llevaria a suponer estados: vuelve como `isError` pidiendo repetir
+con nombre, area o dominio. Los argumentos de todas las herramientas llevan
+descripcion para el modelo.
 
 Que perfil ve cada una NO es de esta capa: son las listas `allow` del dominio en
 la configuracion del core (meta H09P9).
