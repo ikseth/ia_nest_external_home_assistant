@@ -13,7 +13,7 @@ from typing import Any
 from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import PlainTextResponse
-from starlette.routing import Mount
+from starlette.routing import Route
 
 from .server import CatalogServer
 from .upstream import HomeAssistantClient
@@ -94,8 +94,14 @@ def create_app(settings: Settings) -> Starlette:
         async with manager.run():
             yield
 
+    class _McpEndpoint:
+        """ASGI en la ruta exacta /mcp, sin la redireccion 307 de Mount."""
+
+        async def __call__(self, scope: dict[str, Any], receive: Any, send: Any) -> None:
+            await manager.handle_request(scope, receive, send)
+
     app = Starlette(
-        routes=[Mount("/mcp", app=manager.handle_request)],
+        routes=[Route("/mcp", endpoint=_McpEndpoint(), methods=["GET", "POST", "DELETE"])],
         lifespan=lifespan,
     )
     return BearerMiddleware(app, settings.core_token)  # type: ignore[return-value]

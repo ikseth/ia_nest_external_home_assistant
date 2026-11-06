@@ -138,4 +138,4 @@ class CatalogServer:
         return server
 
     def create_session_manager(self) -> StreamableHTTPSessionManager:
-        return StreamableHTTPSessionManager(self.create_mcp_server(), stateless=False)
+        return StreamableHTTPSessionManager(self.create_mcp_server(), stateless=True)
