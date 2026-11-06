@@ -1,40 +1,73 @@
 # ia_nest_external_home_assistant
 
-Estado: semilla (sin codigo ni contrato publico)
-Version: - (2026-11-06)
+Estado: propuesta
+Version: v0.1.0 en preparacion (2026-11-06)
 
-Integracion exterior que ACTUA sobre la casa en nombre del ente IA_NEST
-(`core docs/FRONTERAS.md`, seccion `ia_nest_external_*`). Es la primera capa de
-esa familia.
+Servicio MCP local que presenta al core un catalogo cerrado de acciones de Home
+Assistant. La capa clasifica; el core decide si ofrece o invoca una herramienta
+segun su politica (`core ADR 0007`, `core ADR 0053`).
 
-## Que hara
+## Catalogo
 
-Un servicio pequeno, fuera de Home Assistant, que:
+El contrato publico de v0.1.0 es la tabla D1 de la [decision
+0002](docs/decision_records/0002-catalogo-cerrado-por-tipo-de-entidad.md). Cada
+entrada tiene un esquema cerrado y, cuando procede, fija el tipo de entidad
+antes de llamar a Assist. Por ejemplo, `light_turn_on` siempre envia
+`domain: ["light"]`; no existe un `HassTurnOn` generico.
 
-- se conecta al servidor MCP de Home Assistant con un usuario no administrador y
-  token propio, limitado a las entidades expuestas a los asistentes;
-- publica hacia el core, tambien por MCP, una lista de herramientas filtrada y
-  clasificada: cada herramienta es de solo lectura, inocua o destructiva segun el
-  tipo de entidad a la que va (encender una luz no es lo mismo que "encender" una
-  cerradura, que la bloquea);
-- no publica lo que no sabe clasificar.
+En cada `tools/list` y antes de cada llamada, la capa comprueba que Assist
+publica la intencion y acepta los argumentos fijados. Si no, no publica ni
+invoca la herramienta. Home Assistant caido produce una lista vacia.
 
-El core decide si y cuando invocar una herramienta, con denegar por defecto y su
-politica por perfil (`core ADR 0007`). Esta capa no decide como piensa el ente
-(`core ADR 0033`).
+## Instalacion y configuracion
 
-## Por que existe como capa aparte
+Se requiere Python >=3.13. Para desarrollo:
 
-- La clasificacion es logica de Home Assistant y el core no absorbe la logica
-  de cada integracion.
-- El servidor MCP de Home Assistant no sirve tal cual: marca como destructivas
-  casi todas sus herramientas, incluida la lectura de estado, y usa la misma
-  herramienta para una luz que para una cerradura.
-- No es un componente de Home Assistant (esos viven en `ha-addons`, como la
-  integracion de voz) ni parte del borde, que atiende a quien llama al ente desde
-  fuera.
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -e '.[test]'
+```
 
-Decidido en el hito H09 de `ia_nest_meta` (`docs/plan/hitos/`), pasos H08P3 y
-H09P7-H09P10.
+El servicio lee estos valores del entorno:
 
-Para el orden de lectura y las normas entre capas, ver `AGENTS.md`.
+- `IANEST_EXTERNAL_HA_URL`: base de Home Assistant; el codigo anade
+  `/api/mcp/assist`.
+- `IANEST_EXTERNAL_HA_TOKEN_FILE`: fichero con el token del usuario no
+  administrador de Home Assistant.
+- `IANEST_EXTERNAL_HA_CORE_TOKEN_FILE`: fichero con el token Bearer que debe
+  presentar el core. Es obligatorio para arrancar.
+- `IANEST_EXTERNAL_HA_TIMEOUT_S`: segundos por operacion; por defecto `8` y
+  siempre menor que `10`.
+
+Arranque manual:
+
+```bash
+ianest-external-ha --host 127.0.0.1 --port 8770
+```
+
+El endpoint MCP es `http://127.0.0.1:8770/mcp`. Toda solicitud necesita
+`Authorization: Bearer <token-del-core>`; la comparacion es en tiempo
+constante. Los registros son una linea JSON por llamada, sin tokens.
+
+Para systemd, editar fuera del repositorio una copia de
+`deploy/ejemplo.setup.conf` y ejecutar como root:
+
+```bash
+deploy/setup.sh --config /ruta/privada/external_ha.setup.conf
+```
+
+El instalador crea el usuario de servicio, copia los tokens con modo 600,
+instala desde este arbol, activa y reinicia
+`ianest-external-ha.service`. Despues verifica que el servicio se reinicio, que
+un `tools/list` autenticado incluye `get_live_context` y que la misma ruta sin
+Bearer responde 401.
+
+## Pruebas
+
+```bash
+.venv/bin/pytest -q
+```
+
+Las pruebas arrancan una falsificacion local de Assist a partir de los esquemas
+necesarios de la respuesta real de referencia. No contactan Home Assistant ni
+el core reales.
