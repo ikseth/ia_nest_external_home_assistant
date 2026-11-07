@@ -14,6 +14,7 @@ from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
 from mcp.types import CallToolResult, TextContent, Tool, ToolAnnotations
 
 from .catalog import CATALOG, CATALOG_BY_NAME, LIVE_CONTEXT_MAX_CHARS, LIVE_CONTEXT_TOO_LARGE, CatalogTool
+from .scripts import upstream_accepts_arguments
 from .upstream import HomeAssistantClient, UpstreamError, UpstreamTool, resolve_intent
 
 
@@ -37,6 +38,12 @@ def _upstream_accepts_fixed_arguments(tool: CatalogTool, upstream_tool: Upstream
 
 
 def _validated_catalog_tool(tool: CatalogTool, upstream_tools: list[UpstreamTool]) -> UpstreamTool | None:
+    if tool.intent.startswith("script__"):
+        # Script declarado: nombre exacto en Home Assistant y todos sus argumentos aceptados.
+        upstream_tool = next((t for t in upstream_tools if t.name == tool.intent), None)
+        if upstream_tool is None or not upstream_accepts_arguments(tool, upstream_tool.input_schema):
+            return None
+        return upstream_tool
     upstream_tool = resolve_intent(upstream_tools, tool.intent)
     if upstream_tool is None or not _upstream_accepts_fixed_arguments(tool, upstream_tool):
         return None
@@ -90,6 +97,7 @@ def _log_call(
 @dataclass(frozen=True)
 class CatalogServer:
     upstream: HomeAssistantClient
+    scripts: tuple[CatalogTool, ...] = ()
 
     def create_mcp_server(self) -> Server:
         server = Server("ianest-external-ha", version="0.1.0")
@@ -104,14 +112,14 @@ class CatalogServer:
                 return []
             return [
                 _mcp_tool(tool)
-                for tool in CATALOG
+                for tool in (*CATALOG, *self.scripts)
                 if _validated_catalog_tool(tool, upstream_tools) is not None
             ]
 
         @server.call_tool(validate_input=False)
         async def call_tool(name: str, arguments: dict[str, Any]) -> CallToolResult:
             started = time.monotonic()
-            catalog_tool = CATALOG_BY_NAME.get(name)
+            catalog_tool = CATALOG_BY_NAME.get(name) or next((t for t in self.scripts if t.name == name), None)
             if catalog_tool is None:
                 _log_call(name, arguments, None, "rejected", started)
                 return _error("Tool is not available.")

@@ -15,6 +15,8 @@ from starlette.requests import Request
 from starlette.responses import PlainTextResponse
 from starlette.routing import Route
 
+from .catalog import CatalogTool
+from .scripts import ScriptConfigError, load_scripts
 from .server import CatalogServer
 from .upstream import HomeAssistantClient
 
@@ -29,6 +31,7 @@ class Settings:
     ha_token: str
     core_token: str
     timeout_s: float
+    scripts: tuple[CatalogTool, ...] = ()
 
     @classmethod
     def from_environment(cls, environment: dict[str, str] | None = None) -> Settings:
@@ -50,7 +53,15 @@ class Settings:
                 "IANEST_EXTERNAL_HA_CORE_TOKEN_FILE",
             ),
             timeout_s=timeout_s,
+            scripts=_load_scripts(values.get("IANEST_EXTERNAL_HA_SCRIPTS_FILE")),
         )
+
+
+def _load_scripts(path: str | None) -> tuple[CatalogTool, ...]:
+    try:
+        return load_scripts(path)
+    except ScriptConfigError as exc:
+        raise ConfigurationError(f"IANEST_EXTERNAL_HA_SCRIPTS_FILE: {exc}") from exc
 
 
 def _read_token(path_value: str | None, setting: str) -> str:
@@ -85,7 +96,8 @@ class BearerMiddleware:
 
 def create_app(settings: Settings) -> Starlette:
     catalog_server = CatalogServer(
-        HomeAssistantClient(settings.ha_url, settings.ha_token, settings.timeout_s)
+        HomeAssistantClient(settings.ha_url, settings.ha_token, settings.timeout_s),
+        settings.scripts,
     )
     manager = catalog_server.create_session_manager()
 

@@ -19,6 +19,13 @@ En cada `tools/list` y antes de cada llamada, la capa comprueba que Assist
 publica la intencion y acepta los argumentos fijados. Si no, no publica ni
 invoca la herramienta. Home Assistant caido produce una lista vacia.
 
+## Scripts de la casa
+
+Ademas del catalogo, un despliegue puede declarar scripts propios de su hogar en un
+fichero JSON (`IANEST_EXTERNAL_HA_SCRIPTS_FILE`), con esquema cerrado y marca obligatoria
+([decision 0003](docs/decision_records/0003-scripts-de-la-casa-en-configuracion.md)).
+Lo que no esta declarado no se publica.
+
 ## Instalacion y configuracion
 
 Se requiere Python >=3.13. Para desarrollo:
@@ -36,6 +43,7 @@ El servicio lee estos valores del entorno:
   administrador de Home Assistant.
 - `IANEST_EXTERNAL_HA_CORE_TOKEN_FILE`: fichero con el token Bearer que debe
   presentar el core. Es obligatorio para arrancar.
+- `IANEST_EXTERNAL_HA_SCRIPTS_FILE`: opcional, scripts declarados.
 - `IANEST_EXTERNAL_HA_TIMEOUT_S`: segundos por operacion; por defecto `8` y
   siempre menor que `10`.
 

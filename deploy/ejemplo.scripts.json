@@ -1,0 +1,14 @@
+{
+  "scripts": [
+    {
+      "tool": "media_recommend",
+      "script": "media_recommend",
+      "description": "Recommend something to watch and play it on the TV of a room.",
+      "arguments": {
+        "request": {"type": "string", "description": "What the person wants to watch, in their words."},
+        "room": {"type": "string", "enum": ["living_room", "bedroom"]}
+      },
+      "annotations": {"destructiveHint": false, "openWorldHint": true}
+    }
+  ]
+}

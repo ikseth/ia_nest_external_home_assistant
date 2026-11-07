@@ -9,7 +9,7 @@ set -euo pipefail
 
 readonly REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly UNIT_NAME="ianest-external-ha.service"
-readonly -a CONFIG_KEYS=(SERVICE_USER INSTALL_ROOT HA_URL HA_TOKEN_SOURCE CORE_TOKEN_SOURCE HOST PORT TIMEOUT_S)
+readonly -a CONFIG_KEYS=(SERVICE_USER INSTALL_ROOT HA_URL HA_TOKEN_SOURCE CORE_TOKEN_SOURCE SCRIPTS_SOURCE HOST PORT TIMEOUT_S)
 
 declare -A VALUES=(
   [SERVICE_USER]=ianest-external-ha
@@ -17,6 +17,7 @@ declare -A VALUES=(
   [HA_URL]=http://ha.example:8123
   [HA_TOKEN_SOURCE]=''
   [CORE_TOKEN_SOURCE]=''
+  [SCRIPTS_SOURCE]=''
   [HOST]=127.0.0.1
   [PORT]=8770
   [TIMEOUT_S]=8
@@ -67,6 +68,7 @@ validate_config() {
   [[ "${VALUES[TIMEOUT_S]}" =~ ^[0-9]+([.][0-9]+)?$ ]] || error "TIMEOUT_S debe ser numerico"
   [[ -r "${VALUES[HA_TOKEN_SOURCE]}" ]] || error "no se puede leer HA_TOKEN_SOURCE"
   [[ -r "${VALUES[CORE_TOKEN_SOURCE]}" ]] || error "no se puede leer CORE_TOKEN_SOURCE"
+  [[ -z "${VALUES[SCRIPTS_SOURCE]}" || -r "${VALUES[SCRIPTS_SOURCE]}" ]] || error "no se puede leer SCRIPTS_SOURCE"
 }
 
 prepare_user_and_paths() {
@@ -92,12 +94,19 @@ install_private_files() {
   ENV_FILE="$CONFIG_DIR/ianest-external-ha.env"
   install -o "${VALUES[SERVICE_USER]}" -g "${VALUES[SERVICE_USER]}" -m 600 "${VALUES[HA_TOKEN_SOURCE]}" "$HA_TOKEN_FILE"
   install -o "${VALUES[SERVICE_USER]}" -g "${VALUES[SERVICE_USER]}" -m 600 "${VALUES[CORE_TOKEN_SOURCE]}" "$CORE_TOKEN_FILE"
+  SCRIPTS_FILE="$CONFIG_DIR/scripts.json"
+  if [[ -n "${VALUES[SCRIPTS_SOURCE]}" ]]; then
+    install -o "${VALUES[SERVICE_USER]}" -g "${VALUES[SERVICE_USER]}" -m 600 "${VALUES[SCRIPTS_SOURCE]}" "$SCRIPTS_FILE"
+  else
+    rm -f "$SCRIPTS_FILE"
+  fi
   umask 077
   {
     printf 'IANEST_EXTERNAL_HA_URL=%s\n' "${VALUES[HA_URL]}"
     printf 'IANEST_EXTERNAL_HA_TOKEN_FILE=%s\n' "$HA_TOKEN_FILE"
     printf 'IANEST_EXTERNAL_HA_CORE_TOKEN_FILE=%s\n' "$CORE_TOKEN_FILE"
     printf 'IANEST_EXTERNAL_HA_TIMEOUT_S=%s\n' "${VALUES[TIMEOUT_S]}"
+    [[ -n "${VALUES[SCRIPTS_SOURCE]}" ]] && printf 'IANEST_EXTERNAL_HA_SCRIPTS_FILE=%s\n' "$SCRIPTS_FILE"
   } > "$ENV_FILE"
   chown "${VALUES[SERVICE_USER]}:${VALUES[SERVICE_USER]}" "$ENV_FILE"
   chmod 600 "$ENV_FILE"

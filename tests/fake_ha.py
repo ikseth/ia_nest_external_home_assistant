@@ -47,6 +47,7 @@ def create_app(record_path: Path, without_turn_domain: bool = False) -> Starlett
         _tool("fan__HassFanSetSpeed", _schema({**shared, "domain": domain, "percentage": {"type": "integer", "minimum": 0, "maximum": 100}}, ["percentage"])),
         _tool("assist_satellite__HassBroadcast", _schema({"message": {"type": "string"}}, ["message"])),
         _tool("script__house_script", _schema({})),
+        _tool("script__media_recommend", _schema({"request": {"type": "string"}, "room": {"type": "string", "enum": ["living", "den"]}})),
     ]
 
     @server.list_tools()
