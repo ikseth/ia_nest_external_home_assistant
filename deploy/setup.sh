@@ -106,7 +106,9 @@ install_private_files() {
     printf 'IANEST_EXTERNAL_HA_TOKEN_FILE=%s\n' "$HA_TOKEN_FILE"
     printf 'IANEST_EXTERNAL_HA_CORE_TOKEN_FILE=%s\n' "$CORE_TOKEN_FILE"
     printf 'IANEST_EXTERNAL_HA_TIMEOUT_S=%s\n' "${VALUES[TIMEOUT_S]}"
-    [[ -n "${VALUES[SCRIPTS_SOURCE]}" ]] && printf 'IANEST_EXTERNAL_HA_SCRIPTS_FILE=%s\n' "$SCRIPTS_FILE"
+    if [[ -n "${VALUES[SCRIPTS_SOURCE]}" ]]; then
+      printf 'IANEST_EXTERNAL_HA_SCRIPTS_FILE=%s\n' "$SCRIPTS_FILE"
+    fi
   } > "$ENV_FILE"
   chown "${VALUES[SERVICE_USER]}:${VALUES[SERVICE_USER]}" "$ENV_FILE"
   chmod 600 "$ENV_FILE"
