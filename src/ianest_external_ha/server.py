@@ -43,6 +43,15 @@ def _validated_catalog_tool(tool: CatalogTool, upstream_tools: list[UpstreamTool
     return upstream_tool
 
 
+def _wrong_type_hint(domains: list[str]) -> str:
+    kinds = ", ".join(domains)
+    return (
+        f"Note: this tool only acts on devices of type {kinds}. If the person asked about a device of "
+        "another type, you have no tool to control it: say that you cannot do that. "
+        "Do not say that the device does not exist."
+    )
+
+
 def _mcp_tool(tool: CatalogTool) -> Tool:
     return Tool(
         name=tool.name,
@@ -137,8 +146,14 @@ class CatalogServer:
 
             status = "ha_error" if result.is_error else "ok"
             _log_call(name, arguments, catalog_tool.intent, status, started)
+            content = list(result.content)
+            domains = catalog_tool.fixed_arguments.get("domain")
+            if result.is_error and domains:
+                # Visto en el laboratorio: "No entities matched ... domains light" lleva al modelo a
+                # decir que el aparato no existe cuando es de otro tipo y no tiene herramienta.
+                content.append(TextContent(type="text", text=_wrong_type_hint(domains)))
             return CallToolResult(
-                content=result.content,
+                content=content,
                 structuredContent=result.structured_content,
                 isError=result.is_error,
             )

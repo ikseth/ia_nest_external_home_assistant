@@ -172,3 +172,18 @@ async def test_empty_selectors_are_dropped_before_calling_home_assistant(ha_serv
             result = await client.call_tool("fan_set_speed", {"name": "ventilador", "area": "", "floor": "", "percentage": 50})
     assert result.isError is False
     assert calls(record)[0]["arguments"] == {"name": "ventilador", "percentage": 50, "domain": ["fan"]}
+
+
+@pytest.mark.asyncio
+async def test_error_on_fixed_type_tool_explains_the_type(ha_server):
+    ha_url, _ = ha_server
+    port = free_port()
+    async with run_gateway(settings(ha_url), port):
+        async with gateway_client(f"http://127.0.0.1:{port}", "core-token-not-logged") as client:
+            result = await client.call_tool("light_turn_on", {"name": "ha_error"})
+            plain = await client.call_tool("climate_set_temperature", {"name": "ha_error", "temperature": 20})
+    assert result.isError is True
+    assert result.content[0].text == "Home Assistant reported an error."
+    assert "only acts on devices of type light" in result.content[1].text
+    assert "does not exist" in result.content[1].text
+    assert len(plain.content) == 1

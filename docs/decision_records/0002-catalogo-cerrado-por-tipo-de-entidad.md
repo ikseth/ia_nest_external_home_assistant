@@ -91,6 +91,13 @@ rechaza (esquema de entrada cerrado).
   red o de autenticacion hacia Home Assistant vuelve como `isError` con un texto
   corto y sin detalles internos; el core lo pasa al modelo como resultado
   (`core ADR 0053`, D3).
+- Si Home Assistant devuelve error en una herramienta con el tipo fijado, la capa
+  anade al resultado una nota para el modelo: esa herramienta solo actua sobre ese
+  tipo, y si el aparato es de otro no tiene con que manejarlo y no debe decir que
+  no existe. Visto en el laboratorio el 2026-11-07: `child` pedia encender el
+  ventilador, el modelo lo intentaba con `light_turn_on`, Home Assistant contestaba
+  "no hay entidades con ese nombre en el dominio luz" y el modelo respondia que el
+  ventilador no existe.
 - Una linea de registro por llamada: herramienta, argumentos, herramienta de Home
   Assistant, estado, latencia. Nunca tokens.
 
