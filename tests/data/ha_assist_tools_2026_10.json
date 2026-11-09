@@ -1,0 +1,687 @@
+{
+ "source": "Home Assistant 2026.10.4, /api/mcp/assist tools/list (scripts de la casa retirados)",
+ "tools": [
+  {
+   "name": "assist_satellite__HassBroadcast",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "message": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "message"
+    ]
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": false,
+    "idempotentHint": false,
+    "openWorldHint": false
+   }
+  },
+  {
+   "name": "climate__HassClimateSetTemperature",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "temperature": {
+      "type": "number"
+     },
+     "area": {
+      "type": "string"
+     },
+     "name": {
+      "type": "string"
+     },
+     "floor": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "temperature"
+    ]
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": true,
+    "openWorldHint": false
+   }
+  },
+  {
+   "name": "fan__HassFanSetSpeed",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "area": {
+      "type": "string"
+     },
+     "floor": {
+      "type": "string"
+     },
+     "domain": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "fan"
+       ]
+      }
+     },
+     "percentage": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "The speed percentage of the fan"
+     }
+    },
+    "required": [
+     "percentage"
+    ]
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": true,
+    "openWorldHint": false
+   }
+  },
+  {
+   "name": "homeassistant__GetLiveContext",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "Filter entities by name or alias (case-insensitive)."
+     },
+     "domain": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "array",
+        "items": {
+         "type": "string"
+        }
+       }
+      ],
+      "description": "Filter entities by domain (e.g. 'light', 'sensor'). Accepts a single domain or a list."
+     },
+     "area": {
+      "type": "string",
+      "description": "Filter entities by area name or alias (case-insensitive)."
+     }
+    }
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
+   }
+  },
+  {
+   "name": "intent__HassTurnOn",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "area": {
+      "type": "string"
+     },
+     "floor": {
+      "type": "string"
+     },
+     "domain": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "device_class": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "identify",
+        "restart",
+        "update",
+        "awning",
+        "blind",
+        "curtain",
+        "damper",
+        "door",
+        "garage",
+        "gate",
+        "shade",
+        "shutter",
+        "window",
+        "tv",
+        "speaker",
+        "receiver",
+        "projector",
+        "outlet",
+        "switch",
+        "water",
+        "gas"
+       ]
+      }
+     }
+    }
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
+   }
+  },
+  {
+   "name": "intent__HassTurnOff",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "area": {
+      "type": "string"
+     },
+     "floor": {
+      "type": "string"
+     },
+     "domain": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "device_class": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "identify",
+        "restart",
+        "update",
+        "awning",
+        "blind",
+        "curtain",
+        "damper",
+        "door",
+        "garage",
+        "gate",
+        "shade",
+        "shutter",
+        "window",
+        "tv",
+        "speaker",
+        "receiver",
+        "projector",
+        "outlet",
+        "switch",
+        "water",
+        "gas"
+       ]
+      }
+     }
+    }
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": true,
+    "openWorldHint": false
+   }
+  },
+  {
+   "name": "intent__HassCancelAllTimers",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "area": {
+      "type": "string"
+     }
+    }
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": true,
+    "openWorldHint": false
+   }
+  },
+  {
+   "name": "light__HassLightSet",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "area": {
+      "type": "string"
+     },
+     "floor": {
+      "type": "string"
+     },
+     "domain": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "light"
+       ]
+      }
+     },
+     "color": {
+      "type": "string"
+     },
+     "temperature": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "brightness": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "The brightness percentage of the light between 0 and 100, where 0 is off and 100 is fully lit"
+     }
+    }
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": true,
+    "openWorldHint": false
+   }
+  },
+  {
+   "name": "llm__GetDateTime",
+   "inputSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
+   }
+  },
+  {
+   "name": "media_player__HassMediaUnpause",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "area": {
+      "type": "string"
+     },
+     "floor": {
+      "type": "string"
+     },
+     "domain": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "media_player"
+       ]
+      }
+     },
+     "device_class": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "tv",
+        "speaker",
+        "receiver",
+        "projector"
+       ]
+      }
+     }
+    }
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
+   }
+  },
+  {
+   "name": "media_player__HassMediaPause",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "area": {
+      "type": "string"
+     },
+     "floor": {
+      "type": "string"
+     },
+     "domain": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "media_player"
+       ]
+      }
+     },
+     "device_class": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "tv",
+        "speaker",
+        "receiver",
+        "projector"
+       ]
+      }
+     }
+    }
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": true,
+    "openWorldHint": false
+   }
+  },
+  {
+   "name": "media_player__HassMediaNext",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "area": {
+      "type": "string"
+     },
+     "floor": {
+      "type": "string"
+     },
+     "domain": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "media_player"
+       ]
+      }
+     },
+     "device_class": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "tv",
+        "speaker",
+        "receiver",
+        "projector"
+       ]
+      }
+     }
+    }
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
+   }
+  },
+  {
+   "name": "media_player__HassMediaPrevious",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "area": {
+      "type": "string"
+     },
+     "floor": {
+      "type": "string"
+     },
+     "domain": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "media_player"
+       ]
+      }
+     },
+     "device_class": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "tv",
+        "speaker",
+        "receiver",
+        "projector"
+       ]
+      }
+     }
+    }
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
+   }
+  },
+  {
+   "name": "media_player__HassSetVolume",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "area": {
+      "type": "string"
+     },
+     "floor": {
+      "type": "string"
+     },
+     "domain": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "media_player"
+       ]
+      }
+     },
+     "device_class": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "tv",
+        "speaker",
+        "receiver",
+        "projector"
+       ]
+      }
+     },
+     "volume_level": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "The volume percentage of the media player"
+     }
+    },
+    "required": [
+     "volume_level"
+    ]
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": true,
+    "openWorldHint": false
+   }
+  },
+  {
+   "name": "media_player__HassSetVolumeRelative",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "volume_step": {
+      "anyOf": [
+       {
+        "type": "string",
+        "enum": [
+         "up",
+         "down"
+        ]
+       },
+       {
+        "type": "integer",
+        "minimum": -100,
+        "maximum": 100
+       }
+      ]
+     },
+     "name": {
+      "type": "string"
+     },
+     "area": {
+      "type": "string"
+     },
+     "floor": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "volume_step"
+    ]
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": false,
+    "openWorldHint": false
+   }
+  },
+  {
+   "name": "media_player__HassMediaPlayerMute",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "area": {
+      "type": "string"
+     },
+     "floor": {
+      "type": "string"
+     },
+     "domain": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "media_player"
+       ]
+      }
+     },
+     "device_class": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "tv",
+        "speaker",
+        "receiver",
+        "projector"
+       ]
+      }
+     },
+     "is_volume_muted": {
+      "description": "Whether the media player should be muted or unmuted"
+     }
+    }
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": true,
+    "openWorldHint": false
+   }
+  },
+  {
+   "name": "media_player__HassMediaPlayerUnmute",
+   "inputSchema": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "area": {
+      "type": "string"
+     },
+     "floor": {
+      "type": "string"
+     },
+     "domain": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "media_player"
+       ]
+      }
+     },
+     "device_class": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "tv",
+        "speaker",
+        "receiver",
+        "projector"
+       ]
+      }
+     },
+     "is_volume_muted": {
+      "description": "Whether the media player should be muted or unmuted"
+     }
+    }
+   },
+   "annotations": {
+    "readOnlyHint": false,
+    "destructiveHint": true,
+    "idempotentHint": true,
+    "openWorldHint": false
+   }
+  }
+ ]
+}

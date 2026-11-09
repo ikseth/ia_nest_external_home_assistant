@@ -12,9 +12,11 @@ __pycache__/
 *.swp
 build/
 dist/
+*.egg-info/
 
 # Configuracion efectiva y secretos (se versiona el .example)
 .env
 config/*.yaml
 !config/*.example.yaml
 .venv/
+.pytest_cache/
