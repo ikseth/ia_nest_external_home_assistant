@@ -6,7 +6,7 @@ registro) viven en `ia_nest_meta` y no se repiten aqui. Lee antes:
 
 1. `meta docs/CONVENCIONES_TRANSVERSALES.md` y `meta docs/DOCTRINA_MULTI_IA.md`
 2. `meta docs/REGISTRO_CAPAS.md` y `meta docs/ARQUITECTURA_DE_CAPAS.md`
-3. `meta docs/plan/hitos/H09_home_assistant_al_ente.md` (por que existe y que se
+3. `meta docs/plan/hitos/cerrados/H09_home_assistant_al_ente.md` (por que existe y que se
    decidio: H09P7-H09P10)
 4. `core docs/FRONTERAS.md` (`ia_nest_external_*` y `tool_contracts`),
    `core ADR 0007` (denegar por defecto) y `core ADR 0033` (el exterior no dirige
