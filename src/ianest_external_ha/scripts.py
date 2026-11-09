@@ -5,8 +5,8 @@ declara una lista cerrada en un fichero JSON; un script que no esta en la lista 
 Cada entrada exige su marca (anotaciones MCP con `destructiveHint` explicito) y un esquema de
 argumentos cerrado. Formato:
 
-    {"scripts": [{"tool": "kodi_recommend", "script": "kodi_recomendar",
-                  "description": "...", "arguments": {"peticion": {"type": "string"}},
+    {"scripts": [{"tool": "media_recommend", "script": "media_recommend",
+                  "description": "...", "arguments": {"request": {"type": "string"}},
                   "annotations": {"destructiveHint": false, "openWorldHint": true}}]}
 """
 
