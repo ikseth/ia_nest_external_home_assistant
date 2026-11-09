@@ -1,7 +1,7 @@
 # ia_nest_external_home_assistant
 
 Estado: propuesta
-Version: v0.1.0 en preparacion (2026-11-06)
+Version: v0.1.0 (2026-11-09)
 
 Servicio MCP local que presenta al core un catalogo cerrado de acciones de Home
 Assistant. La capa clasifica; el core decide si ofrece o invoca una herramienta
